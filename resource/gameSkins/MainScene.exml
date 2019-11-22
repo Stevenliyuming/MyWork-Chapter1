@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="MainSceneSkin" width="1920" height="1080" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="16e8cd9dab0" ></w:Config>
+	<e:Image id="bg" x="0" y="-3240" source="背景长_jpg" visible="false"/>
+	<e:Group id="foot_group" width="350" height="200" x="1071" y="815" alpha="1">
+		<e:Image source="mainRes_json.按钮底" x="0" y="0"/>
+		<e:Button id="left_foot_btn" label="" x="25" y="35">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="mainRes_json.按钮左" source.down="mainRes_json.按钮左-点击"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Button id="right_foot_btn" label="" x="173.02" y="35">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="mainRes_json.按钮右" source.down="mainRes_json.按钮右-点击"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+	</e:Group>
+	<e:Group id="hxm_group" width="200" height="150" x="1140" y="612">
+		<e:Image source="mainRes_json.河小马影" x="0" y="0" scaleX="1" scaleY="1"/>
+		<e:Image id="hxm" source="mainRes_json.河小马-静" x="0" y="25" anchorOffsetX="0" anchorOffsetY="0"/>
+	</e:Group>
+	<e:Group id="xy_group" width="200" height="150" x="559" y="612">
+		<e:Image x="0" y="0" scaleX="1" scaleY="1" source="mainRes_json.小优影"/>
+		<e:Image id="xy" x="-6.65" y="25" source="mainRes_json.小优-静"/>
+	</e:Group>
+	<e:Group id="title_group" width="1000" height="120" y="20" anchorOffsetY="0" horizontalCenter="0">
+		<e:Image source="mainRes_json.标题" y="0" x="0" scaleX="1" scaleY="1"/>
+		<e:Button id="playSound_btn" label="" x="-4" y="16.64">
+		<e:skinName>
+			<e:Skin states="up,down,disabled">
+			<e:Image width="100%" height="100%" width.down="95%" height.down="95%" horizontalCenter="0" verticalCenter="0" source="mainRes_json.播放按钮" source.down="mainRes_json.播放按钮"/>
+			<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+			</e:Skin>
+		</e:skinName>
+		</e:Button>
+	</e:Group>
+	<e:Image id="timerImage" source="mainRes_json.倒数3" y="350" horizontalCenter="0"/>
+	<e:Image id="smile_left" source="mainRes_json.得意嘲讽气泡-左" x="759" y="440" alpha="0"/>
+	<e:Image id="tired_right" source="mainRes_json.焦急流汗气泡" x="989.7" y="440" alpha="0"/>
+</e:Skin>
