@@ -27,7 +27,7 @@
 	</e:Group>
 	<e:Group id="xy_group" width="200" height="150" x="559" y="612">
 		<e:Image x="0" y="0" scaleX="1" scaleY="1" source="mainRes_json.小优影"/>
-		<e:Image id="xy" x="-6.65" y="25" source="mainRes_json.小优-静"/>
+		<e:Image id="xy" x="-6.65" y="13" source="mainRes_json.小优-静"/>
 	</e:Group>
 	<e:Group id="title_group" width="1000" height="120" y="20" anchorOffsetY="0" horizontalCenter="0">
 		<e:Image source="mainRes_json.标题" y="0" x="0" scaleX="1" scaleY="1"/>

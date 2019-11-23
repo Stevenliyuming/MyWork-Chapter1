@@ -31,12 +31,18 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 	private upperBg:egret.Bitmap;
 	
 	private moveSpeed:number = 0.2;
+	private initMoveSpeed:number = 0.2;
 	private _hxmSpeed:number = 0.05;
 	private _xySpeed:number = 0.05;
 	private _xyStopTime:number = 0;
+	//上一帧时间
 	private lastTime:number = 0;
 
 	private _isGameStart:boolean = false;
+
+	private _isXYBehineHXM = false;
+
+	private hxmAnimationType:number = 0;
 	
 	public constructor() {
 		super();
@@ -49,6 +55,9 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 
 	protected childrenCreated():void {
 		super.childrenCreated();
+
+		//初始化
+		this.Init();
 
 		//背景
 		this._bg = GameUtil.Instance.createBitmapByName("背景长_jpg");
@@ -135,6 +144,10 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 		// document.addEventListener("keyup", this.onkeyup.bind(this))
 	}
 
+	private Init() {
+		this.initMoveSpeed = this.moveSpeed;
+	}
+
 	private changeTimerImage() {
 		this.timerIndex -= 1;
 		if(this.timerIndex < 0) {
@@ -186,11 +199,46 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 			this.addEventListener(egret.Event.ENTER_FRAME, this.frameUpdate, this);
 			this.lastTime = egret.getTimer();
 
-			document.addEventListener("keydown", this.onkeydown.bind(this))
-			document.addEventListener("keyup", this.onkeyup.bind(this))
+			//键盘事件监听
+			this.onkeydown = this.onkeydown.bind(this);
+			this.onkeyup = this.onkeyup.bind(this);
+			document.addEventListener("keydown", this.onkeydown)
+			document.addEventListener("keyup", this.onkeyup)
 
-			//this._hxm.gotoAndPlay("run", -1);
+			this._hxm.gotoAndPlay("run", 1);
 			this._xy.gotoAndPlay("run", -1);
+
+			this._hxm.addEventListener(egret.Event.LOOP_COMPLETE, function (e: egret.Event): void {
+				if(!this._isGameStart) {
+					this._hxm.stop();
+				}
+				// else {
+				// 	if(this.hxmAnimationType == 0) {
+				// 		this._hxm.gotoAndPlay("run", 1);
+				// 	}
+				// 	else if(this.hxmAnimationType == 1) {
+				// 		this._hxm.gotoAndPlay("left_run", 1);
+				// 	}
+				// 	else if(this.hxmAnimationType == 2) {
+				// 		this._hxm.gotoAndPlay("right_run", 1);
+				// 	}
+				// 	console.log("loop complete");
+				// }
+				//console.log("loop complete");
+			}, this);
+
+			this._hxm.addEventListener(egret.Event.COMPLETE, function (e: egret.Event): void {
+				if(!this._isGameStart) {
+					this._hxm.stop();
+				}
+				else {
+					if(this.left_foot_runCounter <= 0 && this.right_foot_runCounter <= 0) {
+						this._hxm.gotoAndPlay("run", 1);
+					}
+				}
+				this._hxm.frameRate = this._frameRate;
+				//console.log("complete");
+			}, this);
 
 			//开始游戏
 			this._isGameStart = true;
@@ -205,6 +253,10 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 	}
 
 	private frameUpdate() {
+
+		if(!this._isGameStart) {
+			return;
+		}
 
 		var currentTime: number = egret.getTimer();
 		var gapTime: number = currentTime - this.lastTime;
@@ -237,11 +289,6 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 			if (this.finishedLine.y >= this.hxm_group.y) {
 
 				this.gameFinished();
-
-				this.finishedLine.y = this.hxm_group.y;
-
-				this._xySpeed += this.moveSpeed;
-				this._hxmSpeed += this.moveSpeed;
 			}
 		}
 
@@ -249,46 +296,57 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 		if(this.left_foot_runCounter > 0) {
 
 			if(!this._hxm.isPlaying) {
+				if(this.left_foot_runCounter > 1) {
+					this.showEmoji(0);
+				}
 				this._hxm.gotoAndPlay("left_run", this.left_foot_runCounter);
-				this._hxm.frameRate = this._frameRate * 2;
 				this.left_foot_runCounter = 0;
-
-				this.showEmoji(0);
-
-				//this.calculateChaseTime();
+				//this.hxmAnimationType = 1;
+				this._hxm.frameRate = this._frameRate * 2;
 			}
 		}
 
 		if(this.right_foot_runCounter > 0) {
 
 			if(!this._hxm.isPlaying) {
+				if(this.right_foot_runCounter > 1) {
+					this.showEmoji(0);
+				}
 				this._hxm.gotoAndPlay("right_run", this.right_foot_runCounter);
-				this._hxm.frameRate = this._frameRate * 2;
 				this.right_foot_runCounter = 0;
-
-				this.showEmoji(0);
-
-				//this.calculateChaseTime();
+				//this.hxmAnimationType = 2;
+				this._hxm.frameRate = this._frameRate * 2;
 			}
 		}
 
 		//小优移动
 		if(this._xyStopTime == 0) {
-			this.xy_group.y -= this._xySpeed * gapTime;
+			this.xy_group.y -= this._xySpeed * gapTime;//小优前进
 			if(this.xy_group.y <= this.finishedLine.y - 100) {
 				this.xy_group.y = this.finishedLine.y - 100;
 
 				this.gameFinished();
+			}
+
+			//小优从落后到追上河小马 显示得意表情
+			if(this.xy_group.y < this.hxm_group.y && this._isXYBehineHXM) {
+				this._isXYBehineHXM = false;
+				this.showEmoji(1);
 			}
 		}
 		else {
 			this._xyStopTime -= gapTime / 1000;
 			if(this._xyStopTime <= 0) {
 				this._xyStopTime = 0;
-				this.moveSpeed = 0.2;
+				this.moveSpeed = this.initMoveSpeed;//恢复场景物体移动速度
 			}
-			this.xy_group.y += this.moveSpeed * gapTime;
+			this.xy_group.y += this.moveSpeed * gapTime;//小优跟随场景背景后退移动，达到被河小马追赶落后的效果
 			//console.log(this._xyStopTime);
+		}
+
+		//判断小优落后河小马
+		if(this.xy_group.y > this.hxm_group.y) {
+			this._isXYBehineHXM = true;
 		}
 	}
 
@@ -296,11 +354,17 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 		//游戏结束
 		this._isGameStart = false;
 
-		document.removeEventListener("keydown", this.onkeydown.bind(this))
-		document.removeEventListener("keyup", this.onkeyup.bind(this))
+		document.removeEventListener("keydown", this.onkeydown);
+		document.removeEventListener("keyup", this.onkeyup);
+
+		this.left_foot_btn.currentState = "up";
+		this.right_foot_btn.currentState = "up";
 
 		this.left_foot_btn.touchEnabled = false;
 		this.right_foot_btn.touchEnabled = false;
+
+		//播放声音按钮
+		this.title_group.getChildAt(1).touchEnabled = false;
 
 		this._xy.stop();
 		this._hxm.stop();
@@ -337,28 +401,95 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 		//console.log(event.keyCode);
 		if (event.keyCode == 37) {
 			//left Arrow
-			this.leftFootKeyBoard(1);
+			this.footKeyBoard('left', 'down');
 		}
 
 		if (event.keyCode == 39) {
 			//right Arrow
-			this.rightFootKeyBoard(1);
+			this.footKeyBoard('right', 'down');
 		}
     }
 
 	private onkeyup(event) {
 
-		console.log(event.keyCode);
+		//console.log(event.keyCode);
 		if (event.keyCode == 37) {
 			//left Arrow
-			this.leftFootKeyBoard(0);
+			this.footKeyBoard('left', 'up');
 		}
 
 		if (event.keyCode == 39) {
 			//right Arrow
-			this.rightFootKeyBoard(0);
+			this.footKeyBoard('right', 'up');
 		}
     }
+
+	private footKeyBoard(foot:string, keystatus:string) {
+		if(foot === "left") {
+			if(keystatus === "down" && this.left_foot_btn.currentState !== "down") {
+				this.left_foot_btn.currentState = "down";
+
+				this.pressLeftFoot();
+			}
+			else if(keystatus === "up") {
+				this.left_foot_btn.currentState = "up";
+			}
+		}
+		else if(foot === "right") {
+			if(keystatus === "down" && this.right_foot_btn.currentState !== "down") {
+				this.right_foot_btn.currentState = "down";
+
+				this.pressRightFoot();
+			}
+			else if(keystatus === "up") {
+				this.right_foot_btn.currentState = "up";
+			}
+		}
+	}
+
+	private pressLeftFoot() {
+		//console.log("left down");
+		if(!this._hxm.isPlaying) {
+			this._hxm.stop();
+			this._hxm.gotoAndPlay("left_run", this.left_foot_runCounter);
+			this._hxm.frameRate = this._frameRate;
+			this.left_foot_runCounter = 0;
+		}
+		else {
+			this.left_foot_runCounter += 1;
+		}
+		this.calculateChaseTime();
+	}
+
+	private pressRightFoot() {
+		//console.log("right down");
+		if(!this._hxm.isPlaying) {
+			this._hxm.gotoAndPlay("right_run", this.right_foot_runCounter);
+			this._hxm.frameRate = this._frameRate;
+			this.right_foot_runCounter = 0;
+		}
+		else {
+			this.right_foot_runCounter += 1;
+		}
+		this.calculateChaseTime();
+	}
+
+	private calculateChaseTime() {
+
+		//this.lastTime = egret.getTimer();
+
+		this.moveSpeed = 0.3;
+		if(this.xy_group.y < this.hxm_group.y) {
+			this._xyStopTime = Math.abs(this.xy_group.y - this.hxm_group.y) / this.moveSpeed / 1000;
+			this._xyStopTime += 0.1;
+		}
+		else {
+			if(this._xyStopTime < 0.1) {
+				this._xyStopTime += (Math.random() * 0.1) + 0.1;//Math.abs(this.xy_group.y - this.hxm_group.y) / this.moveSpeed / 1000;
+			}
+			console.log(this._xyStopTime);
+		}
+	}
 
 	private onRollOver(e: egret.TouchEvent): void {
         console.log("roll over " + e.target.name + "  " + e.bubbles);
@@ -375,65 +506,4 @@ class MainScene extends eui.Component implements  eui.UIComponent {
     private onMouseOut(e: egret.TouchEvent): void {
         console.log("mouse out " + e.target.name + "  " + e.bubbles);
     }
-
-	private leftFootKeyBoard(type:number) {
-		if(type == 0 && this.left_foot_btn.currentState !== "down") {
-			this.left_foot_btn.currentState = "down";
-		}
-		else if(type == 1) {
-			this.left_foot_btn.currentState = "up";
-		}
-
-		this.pressLeftFoot();
-	}
-
-	private rightFootKeyBoard(type:number) {
-		if (type == 0 && this.right_foot_btn.currentState !== "down") {
-			this.right_foot_btn.currentState = "down";
-		}
-		else if(type == 1) {
-			this.right_foot_btn.currentState = "up";
-		}
-
-		this.pressRightFoot();
-	}
-
-	private pressLeftFoot() {
-		//console.log("left down");
-		if(!this._hxm.isPlaying) {
-			this._hxm.gotoAndPlay("left_run", this.left_foot_runCounter);
-			this._hxm.frameRate = this._frameRate;
-			this.left_foot_runCounter = 0;
-		}
-		else {
-			this.left_foot_runCounter += 1;
-
-			// this.calculateChaseTime();
-		}
-		this.calculateChaseTime();
-	}
-
-	private pressRightFoot() {
-		//console.log("right down");
-		if(!this._hxm.isPlaying) {
-			this._hxm.gotoAndPlay("right_run", this.right_foot_runCounter);
-			this._hxm.frameRate = this._frameRate;
-			this.right_foot_runCounter = 0;
-		}
-		else {
-			this.right_foot_runCounter += 1;
-
-			//this.calculateChaseTime();
-		}
-		this.calculateChaseTime();
-	}
-
-	private calculateChaseTime() {
-
-		this.lastTime = egret.getTimer();
-
-		this.moveSpeed = 0.3;
-		this._xyStopTime += Math.abs(this.xy_group.y - this.hxm_group.y) / this.moveSpeed / 1000;
-		console.log(this._xyStopTime);
-	}
 }
