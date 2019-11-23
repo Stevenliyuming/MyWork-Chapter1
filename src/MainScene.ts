@@ -487,7 +487,7 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 			if(this._xyStopTime < 0.1) {
 				this._xyStopTime += (Math.random() * 0.1) + 0.1;//Math.abs(this.xy_group.y - this.hxm_group.y) / this.moveSpeed / 1000;
 			}
-			console.log(this._xyStopTime);
+			//console.log(this._xyStopTime);
 		}
 	}
 

@@ -55,7 +55,7 @@ var MainScene = (function (_super) {
         this.finishedLine.anchorOffsetY = this.finishedLine.height / 2;
         this.addChildAt(this.finishedLine, 1);
         this.finishedLine.x = GameUtil.Instance.stageCenterW;
-        this.finishedLine.y = -(this._bg.height - GameUtil.Instance.stageH - this.hxm_group.y - 500); //this._bg.y - this._bg.height + GameUtil.Instance.stageH + 200;
+        this.finishedLine.y = -(this._bg.height - GameUtil.Instance.stageH - this.hxm_group.y); //this._bg.y - this._bg.height + GameUtil.Instance.stageH + 200;
         // console.log(this._bg.y);
         // console.log(this._bg.height);
         // console.log(this.finishedLine.y);
