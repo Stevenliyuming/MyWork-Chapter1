@@ -55,7 +55,7 @@ var MainScene = (function (_super) {
         this.finishedLine.anchorOffsetY = this.finishedLine.height / 2;
         this.addChildAt(this.finishedLine, 1);
         this.finishedLine.x = GameUtil.Instance.stageCenterW;
-        this.finishedLine.y = this._bg.y - this._bg.height + GameUtil.Instance.stageH + 200;
+        this.finishedLine.y = -(this._bg.height - GameUtil.Instance.stageH - this.hxm_group.y - 500); //this._bg.y - this._bg.height + GameUtil.Instance.stageH + 200;
         // console.log(this._bg.y);
         // console.log(this._bg.height);
         // console.log(this.finishedLine.y);
@@ -220,12 +220,12 @@ var MainScene = (function (_super) {
         // 	this.finishedLine.y += this.moveSpeed * gapTime;
         // 	this.upperBg.y += this.moveSpeed * gapTime;
         // }
-        if (this.finishedLine.y < this.hxm_group.y) {
+        if (this.hxm_group.y > this.finishedLine.y) {
             var moveDelta = this.moveSpeed * gapTime;
             this._bg.y += moveDelta;
             this.finishedLine.y += moveDelta;
             //this.upperBg.y += moveDelta;
-            if (this.finishedLine.y >= this.hxm_group.y) {
+            if (this.hxm_group.y <= this.finishedLine.y) {
                 this.gameFinished();
             }
         }
@@ -255,8 +255,8 @@ var MainScene = (function (_super) {
         //小优移动
         if (this._xyStopTime == 0) {
             this.xy_group.y -= this._xySpeed * gapTime; //小优前进
-            if (this.xy_group.y <= this.finishedLine.y - 100) {
-                this.xy_group.y = this.finishedLine.y - 100;
+            if (this.xy_group.y <= this.finishedLine.y) {
+                this.xy_group.y = this.finishedLine.y;
                 this.gameFinished();
             }
             //小优从落后到追上河小马 显示得意表情
