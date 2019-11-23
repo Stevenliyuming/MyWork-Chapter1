@@ -326,6 +326,12 @@ class MainScene extends eui.Component implements  eui.UIComponent {
 				this.xy_group.y = this.finishedLine.y;
 
 				this.gameFinished();
+
+				if(this.xy_group.y < 200) {
+					egret.Tween.get(this.xy_group).to({ y:this.xy_group.y + (this.hxm_group.y - 200) }, 1000, egret.Ease.sineIn)
+					egret.Tween.get(this._bg).to({ y:this._bg.y + (this.hxm_group.y - 200) }, 1000, egret.Ease.sineIn)
+					egret.Tween.get(this.finishedLine).to({ y:this.finishedLine.y + (this.hxm_group.y - 200) }, 1000, egret.Ease.sineIn)
+				}
 			}
 
 			//小优从落后到追上河小马 显示得意表情
